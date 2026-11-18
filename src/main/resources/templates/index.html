@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Tableau de bord')}"></head>
+<body>
+<nav th:replace="~{fragments :: navbar('accueil')}"></nav>
+<main class="container">
+    <div th:replace="~{fragments :: alerts}"></div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+            <h2 class="page-title">Tableau de bord</h2>
+            <p class="page-sub">Vue d'ensemble des activités différenciées et des résultats</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" th:href="@{/apprenants/nouveau}"><i class="bi bi-person-plus me-1"></i>Nouvel apprenant</a>
+            <a class="btn btn-brand" th:href="@{/affectations/nouvelle}"><i class="bi bi-plus-circle me-1"></i>Affecter une activité</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card stat-card"><div class="card-body d-flex align-items-center gap-3">
+                <div class="icone ic-indigo"><i class="bi bi-people"></i></div>
+                <div><div class="valeur" th:text="${nbApprenants}">0</div><div class="titre">Apprenants</div></div>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card stat-card"><div class="card-body d-flex align-items-center gap-3">
+                <div class="icone ic-vert"><i class="bi bi-journal-text"></i></div>
+                <div><div class="valeur" th:text="${nbActivites}">0</div><div class="titre">Activités</div></div>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card stat-card"><div class="card-body d-flex align-items-center gap-3">
+                <div class="icone ic-orange"><i class="bi bi-diagram-3"></i></div>
+                <div><div class="valeur" th:text="${nbAffectations}">0</div><div class="titre">Affectations</div></div>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card stat-card"><div class="card-body d-flex align-items-center gap-3">
+                <div class="icone ic-rose"><i class="bi bi-graph-up-arrow"></i></div>
+                <div><div class="valeur" th:text="${moyenneGenerale} + ' %'">0 %</div><div class="titre">Moyenne générale</div></div>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header"><i class="bi bi-bar-chart-line me-2"></i>Résultats par niveau d'apprenant</div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                        <tr><th>Niveau</th><th>Affectations</th><th>Terminées</th><th style="min-width:180px">Moyenne des résultats</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="s : ${stats}">
+                            <td><span class="pill" th:classappend="'niv-' + ${s.niveau.name()}" th:text="${s.niveau.label}"></span></td>
+                            <td th:text="${s.total}"></td>
+                            <td th:text="${s.termines}"></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress flex-grow-1">
+                                        <div class="progress-bar" th:classappend="'bar-' + ${s.niveau.name()}" th:style="'width:' + ${s.moyenne} + '%'"></div>
+                                    </div>
+                                    <strong th:text="${s.moyenne} + ' %'"></strong>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header"><i class="bi bi-activity me-2"></i>État d'avancement</div>
+                <div class="card-body">
+                    <div class="progress mb-4" style="height:16px" th:if="${nbAffectations > 0}">
+                        <div class="progress-bar bg-secondary" th:style="'width:' + ${nbAFaire * 100 / nbAffectations} + '%'"></div>
+                        <div class="progress-bar bg-primary" th:style="'width:' + ${nbEnCours * 100 / nbAffectations} + '%'"></div>
+                        <div class="progress-bar bg-success" th:style="'width:' + ${nbTermines * 100 / nbAffectations} + '%'"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2"><span><i class="bi bi-circle-fill text-secondary me-2"></i>À faire</span><strong th:text="${nbAFaire}">0</strong></div>
+                    <div class="d-flex justify-content-between mb-2"><span><i class="bi bi-circle-fill text-primary me-2"></i>En cours</span><strong th:text="${nbEnCours}">0</strong></div>
+                    <div class="d-flex justify-content-between"><span><i class="bi bi-circle-fill text-success me-2"></i>Terminées</span><strong th:text="${nbTermines}">0</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header"><i class="bi bi-exclamation-triangle me-2 text-danger"></i>Activités en retard</div>
+                <div class="list-group list-group-flush" th:if="${!enRetard.isEmpty()}">
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                       th:each="a : ${enRetard}" th:href="@{/affectations/{id}/suivi(id=${a.id})}">
+                        <div>
+                            <div class="fw-semibold" th:text="${a.apprenant.prenom} + ' ' + ${a.apprenant.nom}"></div>
+                            <small class="text-muted" th:text="${a.activite.titre}"></small>
+                        </div>
+                        <span class="pill pill-retard" th:text="'Limite : ' + ${a.dateLimite}"></span>
+                    </a>
+                </div>
+                <div class="vide" th:if="${enRetard.isEmpty()}"><i class="bi bi-check2-circle"></i>Aucune activité en retard</div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header"><i class="bi bi-clock-history me-2"></i>Dernières affectations</div>
+                <div class="list-group list-group-flush" th:if="${!dernieres.isEmpty()}">
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                       th:each="a : ${dernieres}" th:href="@{/affectations/{id}/suivi(id=${a.id})}">
+                        <div>
+                            <div class="fw-semibold" th:text="${a.apprenant.prenom} + ' ' + ${a.apprenant.nom}"></div>
+                            <small class="text-muted" th:text="${a.activite.titre}"></small>
+                        </div>
+                        <span class="pill" th:classappend="'st-' + ${a.statut.name()}" th:text="${a.statut.label}"></span>
+                    </a>
+                </div>
+                <div class="vide" th:if="${dernieres.isEmpty()}"><i class="bi bi-inbox"></i>Aucune affectation pour le moment</div>
+            </div>
+        </div>
+    </div>
+</main>
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

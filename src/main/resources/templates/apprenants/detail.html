@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Apprenant')}"></head>
+<body>
+<nav th:replace="~{fragments :: navbar('apprenants')}"></nav>
+<main class="container">
+    <div th:replace="~{fragments :: alerts}"></div>
+    <a class="text-decoration-none" th:href="@{/apprenants}"><i class="bi bi-arrow-left me-1"></i>Retour aux apprenants</a>
+
+    <div class="card my-3">
+        <div class="card-body d-flex flex-wrap align-items-center gap-3">
+            <span class="avatar avatar-lg" th:text="${#strings.toUpperCase(#strings.substring(apprenant.prenom, 0, 1) + #strings.substring(apprenant.nom, 0, 1))}"></span>
+            <div class="flex-grow-1">
+                <h3 class="mb-1" th:text="${apprenant.prenom} + ' ' + ${apprenant.nom}"></h3>
+                <span class="pill pill-groupe me-1" th:text="'Groupe ' + ${apprenant.groupe}"></span>
+                <span class="pill" th:classappend="'niv-' + ${apprenant.niveauActuel.name()}" th:text="${apprenant.niveauActuel.label}"></span>
+            </div>
+            <div class="d-flex gap-2">
+                <a class="btn btn-success" th:href="@{/affectations/nouvelle(apprenantId=${apprenant.id})}"><i class="bi bi-plus-circle me-1"></i>Affecter une activité</a>
+                <a class="btn btn-outline-primary" th:href="@{/apprenants/{id}/modifier(id=${apprenant.id})}"><i class="bi bi-pencil me-1"></i>Modifier</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3 text-center">
+        <div class="col-4"><div class="card"><div class="card-body"><div class="fs-3 fw-bold" th:text="${affectations.size()}">0</div><div class="text-muted small">Activités affectées</div></div></div></div>
+        <div class="col-4"><div class="card"><div class="card-body"><div class="fs-3 fw-bold" th:text="${termines}">0</div><div class="text-muted small">Terminées</div></div></div></div>
+        <div class="col-4"><div class="card"><div class="card-body"><div class="fs-3 fw-bold" th:text="${moyenne} + ' %'">0 %</div><div class="text-muted small">Moyenne des résultats</div></div></div></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><i class="bi bi-list-check me-2"></i>Activités de l'apprenant</div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead><tr><th>Activité</th><th>Difficulté</th><th>Date limite</th><th>Statut</th><th>Résultat</th><th>Commentaire</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="a : ${affectations}" th:classappend="${a.enRetard} ? 'ligne-retard'">
+                    <td class="fw-semibold" th:text="${a.activite.titre}"></td>
+                    <td><span class="pill" th:classappend="'niv-' + ${a.activite.niveauDifficulte.name()}" th:text="${a.activite.niveauDifficulte.label}"></span></td>
+                    <td>
+                        <span th:text="${a.dateLimite}"></span>
+                        <span class="pill pill-retard ms-1" th:if="${a.enRetard}">En retard</span>
+                    </td>
+                    <td><span class="pill" th:classappend="'st-' + ${a.statut.name()}" th:text="${a.statut.label}"></span></td>
+                    <td th:text="${a.resultat != null} ? ${a.resultat} + ' %' : '-'"></td>
+                    <td class="text-muted small" th:text="${a.commentaire}"></td>
+                    <td class="text-end"><a class="btn btn-sm btn-outline-primary btn-icone" th:href="@{/affectations/{id}/suivi(id=${a.id})}"><i class="bi bi-pencil-square"></i> Suivi</a></td>
+                </tr>
+                <tr th:if="${affectations.isEmpty()}">
+                    <td colspan="7"><div class="vide"><i class="bi bi-inbox"></i>Aucune activité affectée pour le moment</div></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

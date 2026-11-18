@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Apprenants')}"></head>
+<body>
+<nav th:replace="~{fragments :: navbar('apprenants')}"></nav>
+<main class="container">
+    <div th:replace="~{fragments :: alerts}"></div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+            <h2 class="page-title">Apprenants</h2>
+            <p class="page-sub"><span th:text="${apprenants.size()}">0</span> apprenant(s) affiché(s)</p>
+        </div>
+        <a class="btn btn-brand" th:href="@{/apprenants/nouveau}"><i class="bi bi-person-plus me-1"></i>Nouvel apprenant</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-2" th:action="@{/apprenants}" method="get">
+                <div class="col-md-5">
+                    <input class="form-control" name="q" th:value="${q}" placeholder="Rechercher par nom, prénom ou groupe...">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="niveau">
+                        <option value="">Tous les niveaux</option>
+                        <option th:each="n : ${niveaux}" th:value="${n}" th:text="${n.label}" th:selected="${n == niveauChoisi}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button class="btn btn-brand"><i class="bi bi-search me-1"></i>Rechercher</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/apprenants}">Réinitialiser</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead><tr><th>Apprenant</th><th>Groupe</th><th>Niveau actuel</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                <tr th:each="a : ${apprenants}">
+                    <td>
+                        <a class="d-flex align-items-center gap-3 text-decoration-none text-reset" th:href="@{/apprenants/{id}(id=${a.id})}">
+                            <span class="avatar" th:text="${#strings.toUpperCase(#strings.substring(a.prenom, 0, 1) + #strings.substring(a.nom, 0, 1))}"></span>
+                            <span class="fw-semibold" th:text="${a.prenom} + ' ' + ${a.nom}"></span>
+                        </a>
+                    </td>
+                    <td><span class="pill pill-groupe" th:text="${a.groupe}"></span></td>
+                    <td><span class="pill" th:classappend="'niv-' + ${a.niveauActuel.name()}" th:text="${a.niveauActuel.label}"></span></td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-success btn-icone" title="Affecter une activité" th:href="@{/affectations/nouvelle(apprenantId=${a.id})}"><i class="bi bi-plus-circle"></i> Affecter</a>
+                        <a class="btn btn-sm btn-outline-secondary btn-icone" title="Voir" th:href="@{/apprenants/{id}(id=${a.id})}"><i class="bi bi-eye"></i></a>
+                        <a class="btn btn-sm btn-outline-primary btn-icone" title="Modifier" th:href="@{/apprenants/{id}/modifier(id=${a.id})}"><i class="bi bi-pencil"></i></a>
+                        <form class="d-inline" sec:authorize="hasRole('ADMIN')" th:action="@{/apprenants/{id}/supprimer(id=${a.id})}" method="post"
+                              onsubmit="return confirm('Supprimer cet apprenant ?')">
+                            <button class="btn btn-sm btn-outline-danger btn-icone" title="Supprimer"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${apprenants.isEmpty()}">
+                    <td colspan="4"><div class="vide"><i class="bi bi-people"></i>Aucun apprenant trouvé</div></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

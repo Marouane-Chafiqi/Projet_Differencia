@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Connexion')}"></head>
+<body>
+<main class="login-wrap">
+    <div class="login-card">
+        <div class="card">
+            <div class="card-body p-4 p-md-5">
+                <div class="login-logo"><i class="bi bi-mortarboard-fill"></i></div>
+                <h3 class="text-center fw-bold mb-1">Differencia</h3>
+                <p class="text-center text-muted mb-4">Connectez-vous pour continuer</p>
+
+                <div class="alert alert-danger" th:if="${param.error}">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Identifiants incorrects, ou compte désactivé / temporairement verrouillé.
+                </div>
+                <div class="alert alert-success" th:if="${param.logout}">
+                    <i class="bi bi-check-circle-fill me-2"></i>Vous avez été déconnecté.
+                </div>
+
+                <form th:action="@{/login}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label" for="username">Nom d'utilisateur</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input class="form-control" id="username" name="username" autocomplete="username" autofocus required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="password">Mot de passe</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input class="form-control" type="password" id="password" name="password" autocomplete="current-password" required>
+                        </div>
+                    </div>
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="remember-me" name="remember-me">
+                        <label class="form-check-label" for="remember-me">Se souvenir de moi</label>
+                    </div>
+                    <button class="btn btn-brand w-100 py-2" type="submit"><i class="bi bi-box-arrow-in-right me-1"></i>Se connecter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

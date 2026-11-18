@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Apprenant')}"></head>
+<body>
+<nav th:replace="~{fragments :: navbar('apprenants')}"></nav>
+<main class="container" style="max-width:640px">
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-person me-2"></i><span th:if="${apprenant.id == null}">Nouvel apprenant</span><span th:if="${apprenant.id != null}">Modifier l'apprenant</span>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/apprenants/enregistrer}" th:object="${apprenant}" method="post">
+                <input type="hidden" th:field="*{id}">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nom <span class="etoile">*</span></label>
+                        <input class="form-control" th:field="*{nom}" th:errorclass="is-invalid" placeholder="Ex : Alaoui">
+                        <div class="invalid-feedback" th:errors="*{nom}"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Prénom <span class="etoile">*</span></label>
+                        <input class="form-control" th:field="*{prenom}" th:errorclass="is-invalid" placeholder="Ex : Sara">
+                        <div class="invalid-feedback" th:errors="*{prenom}"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Groupe <span class="etoile">*</span></label>
+                        <input class="form-control" th:field="*{groupe}" th:errorclass="is-invalid" placeholder="Ex : G1">
+                        <div class="invalid-feedback" th:errors="*{groupe}"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Niveau actuel <span class="etoile">*</span></label>
+                        <select class="form-select" th:field="*{niveauActuel}" th:errorclass="is-invalid">
+                            <option value="">-- Choisir --</option>
+                            <option th:each="n : ${niveaux}" th:value="${n}" th:text="${n.label}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{niveauActuel}"></div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-brand"><i class="bi bi-check2 me-1"></i>Enregistrer</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/apprenants}">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>
